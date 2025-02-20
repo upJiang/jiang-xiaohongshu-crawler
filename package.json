@@ -1,0 +1,13 @@
+{
+  "name": "jiang-xiaohongshu-crawler",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node crawler.js"
+  },
+  "dependencies": {
+    "node-schedule": "^2.1.1",
+    "openai": "^4.85.1",
+    "puppeteer": "^22.0.0",
+    "xlsx": "^0.18.5"
+  }
+}
