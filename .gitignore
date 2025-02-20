@@ -1,3 +1,4 @@
 node_modules
 chrome-data
 小红书爬虫文件
+.DS_Store
