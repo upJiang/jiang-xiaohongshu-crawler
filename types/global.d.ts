@@ -42,6 +42,7 @@ declare global {
     VITE_OPENAI_API_KEY: string | undefined;
     NODE_ENV: string;
     VITE_MAIN_HOST: string;
+    VITE_SERVER_HOST: string;
   }
 
   declare function parseInt(s: string | number, radix?: number): number;

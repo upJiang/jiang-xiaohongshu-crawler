@@ -85,7 +85,16 @@ Github 仓库中的新建 5 个 Repository secrets
 
 - SERVER_HOST：服务器 ip
 - SERVER_USERNAME：服务器登录用户名，一般 root
-- SERVER_SSH_KEY：服务器上生成的私钥
+- SERVER_SSH_KEY：
+  - 在本地生成 ssh 密钥对
+    ```bash
+    ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    ```
+  - 将私钥添加到 Github 仓库的 Repository secrets 中，命名为 SERVER_SSH_KEY
+  - 将公钥添加到服务器的 ~/.ssh/authorized_keys 文件中
+    ```bash
+    echo "前面生成的公钥内容.pub" >> ~/.ssh/authorized_keys
+    ```
 - ALIYUN_DOCKER_USERNAME：阿里云 Docker 用户名
 - ALIYUN_DOCKER_PASSWORD：阿里云 Docker 密码
 

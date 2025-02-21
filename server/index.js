@@ -11,10 +11,12 @@ const app = express();
 // 更新 CORS 配置
 app.use(
   cors({
-    origin: ["http://localhost:7777", "http://localhost:4000"], // 允许的前端域名
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // 允许的请求方法
-    allowedHeaders: ["Content-Type", "Authorization"], // 允许的请求头
-    credentials: true, // 允许发送cookie
+    origin: process.env.NODE_ENV === 'production'
+      ? ['http://121.4.86.16:4000', 'http://121.4.86.16:4000'] // 生产环境域名
+      : ['http://localhost:7777', 'http://localhost:4000'], // 开发环境域名
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   }),
 );
 
@@ -337,7 +339,7 @@ process.on("SIGTERM", async () => {
 const PORT = 4000;
 
 // 设置静态文件目录
-app.use(express.static(path.join(__dirname, "public/dist")));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 所有的路由都返回 index.html，支持前端路由
 app.get("*", (req, res) => {

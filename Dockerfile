@@ -17,10 +17,10 @@ COPY . .
 RUN yarn build
 
 # 创建一个专门的目录来存放静态文件
-RUN mkdir -p /app/public
+RUN mkdir -p /app/server/public
 
-# 将构建后的 dist 目录移动到 public 目录下
-RUN mv dist /app/public/
+# 将构建后的 dist 目录移动到正确的 public 目录下
+RUN mv dist /app/server/public/
 
 # 暴露端口（根据您的express服务端口调整）
 EXPOSE 4000

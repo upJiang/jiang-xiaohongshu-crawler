@@ -28,7 +28,7 @@ export async function saveToExcel(
     if (append) {
       try {
         const response = await fetch(
-          `http://localhost:4000/api/readExcel?filename=${filename}`,
+          `${import.meta.env.VITE_SERVER_HOST}/api/readExcel?filename=${filename}`, // 开发环境
         );
         if (response.ok) {
           existingData = await response.json();
@@ -42,16 +42,19 @@ export async function saveToExcel(
     const allData = [...existingData, ...data];
 
     // 发送到服务器保存
-    const response = await fetch("http://localhost:4000/api/saveExcel", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_HOST}/api/saveExcel`, // 开发环境
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       body: JSON.stringify({
         data: allData,
         filename: filename,
-      }),
-    });
+        }),
+      },
+    );
 
     if (!response.ok) {
       throw new Error("保存文件失败");

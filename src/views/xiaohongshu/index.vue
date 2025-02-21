@@ -144,10 +144,13 @@ const handleUpload = async (file: File) => {
   formData.append("file", file);
 
   try {
-    const response = await fetch("http://localhost:4000/api/uploadExcel", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_HOST}/api/uploadExcel`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
 
     if (!response.ok) {
       throw new Error("上传失败");
@@ -177,7 +180,7 @@ const handleSaveToExcel = async () => {
     await saveToExcel(allData, "最新舆情数据.xlsx", false);
 
     // 触发下载
-    window.location.href = `http://localhost:4000/api/downloadExcel?filename=最新舆情数据.xlsx`;
+    window.location.href = `${import.meta.env.VITE_SERVER_HOST}/api/downloadExcel?filename=最新舆情数据.xlsx`;
 
     statusType.value = "success";
     statusMessage.value = "数据保存成功！";
@@ -210,10 +213,12 @@ const startCrawl = async () => {
       existingLinks: Array.from(existingLinks.value),
     };
 
-    const response = await fetch("http://localhost:4000/api/crawl", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_HOST}/api/crawl`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
       },
       body: JSON.stringify(config),
       signal: abortController.value.signal,
