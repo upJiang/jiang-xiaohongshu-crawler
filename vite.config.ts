@@ -39,11 +39,6 @@ export default defineConfig({
         target: "http://localhost:4000",
         changeOrigin: true,
       },
-      "/ai": {
-        target: "https://api.lkeap.cloud.tencent.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ai/, "/v1"),
-      },
     },
   },
 });

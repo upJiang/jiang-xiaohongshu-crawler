@@ -11,11 +11,12 @@ const app = express();
 // 更新 CORS 配置
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? ['http://121.4.86.16:4000', 'http://121.4.86.16:4000'] // 生产环境域名
-      : ['http://localhost:7777', 'http://localhost:4000'], // 开发环境域名
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin:
+      process.env.NODE_ENV === "production"
+        ? ["http://121.4.86.16:4000", "http://121.4.86.16:4000"] // 生产环境域名
+        : ["http://localhost:7777", "http://localhost:4000"], // 开发环境域名
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
@@ -339,7 +340,7 @@ process.on("SIGTERM", async () => {
 const PORT = 4000;
 
 // 修改静态文件目录配置
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // 通配符路由应该放在所有其他路由之后
 app.get("*", (req, res) => {

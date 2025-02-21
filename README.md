@@ -123,3 +123,8 @@ server {
 }
 ```
 
+重启 nginx
+
+```bash
+/etc/init.d/nginx restart
+```
