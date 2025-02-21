@@ -99,3 +99,27 @@ Github 仓库中的新建 5 个 Repository secrets
 - ALIYUN_DOCKER_PASSWORD：阿里云 Docker 密码
 
 腾讯防火墙需要开放 4000 端口
+
+在 nginx 配置文件 /www/server/nginx/conf/nginx.conf 中添加配置
+
+```bash
+server {
+    listen 443 ssl;  # 启用 SSL 并监听 443 端口
+    server_name junfeng530.xyz;  # 你的域名
+
+    ssl_certificate /www/server/panel/vhost/cert/junfeng530.xyz/fullchain.pem;  # 替换为你的证书路径
+    ssl_certificate_key /www/server/panel/vhost/cert/junfeng530.xyz/privkey.pem;  # 替换为你的私钥路径
+
+    location /xiaohongshu/ {
+        proxy_pass http://121.4.86.16:4000/;  # 代理到 Docker 容器所在的 3000 端口
+        proxy_set_header Host $host;  # 保持 Host 头部
+        proxy_set_header X-Real-IP $remote_addr;  # 获取真实 IP
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # 传递代理链 IP
+        proxy_set_header X-Forwarded-Proto $scheme;  # 传递协议
+
+        # 处理 URL 重写，将 /api 前缀移除
+        rewrite ^/api/(.*)$ /$1 break;
+    }
+}
+```
+

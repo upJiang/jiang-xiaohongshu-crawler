@@ -338,12 +338,12 @@ process.on("SIGTERM", async () => {
 
 const PORT = 4000;
 
-// 设置静态文件目录
-app.use(express.static(path.join(__dirname, 'public')));
+// 修改静态文件目录配置
+app.use(express.static(path.join(__dirname, '../dist')));
 
-// 所有的路由都返回 index.html，支持前端路由
+// 通配符路由应该放在所有其他路由之后
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/dist/index.html"));
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
 app.listen(PORT, () => {
