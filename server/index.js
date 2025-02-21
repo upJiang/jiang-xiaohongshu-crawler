@@ -339,11 +339,11 @@ process.on("SIGTERM", async () => {
 const PORT = 4000;
 
 // 修改静态文件目录配置
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 通配符路由应该放在所有其他路由之后
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/index.html"));
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 app.listen(PORT, () => {
