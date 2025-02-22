@@ -7,11 +7,8 @@ WORKDIR /app
 # 复制 package.json 和 yarn.lock
 COPY package.json yarn.lock ./
 
-# 安装 yarn 
-RUN npm install -g yarn
-
-# 安装依赖
-RUN yarn install
+# 安装依赖并全局安装 serve
+RUN yarn install && yarn global add serve
 
 # 复制所有源代码
 COPY . .
@@ -19,15 +16,9 @@ COPY . .
 # 构建前端
 RUN yarn build
 
-# 创建一个专门的目录来存放静态文件
-RUN mkdir -p /app/server/public
-
-# 将构建后的文件移动到正确的 public 目录下
-RUN cp -r dist/* /app/server/public/
-
-# 暴露端口（根据您的express服务端口调整）
+# 暴露端口
 EXPOSE 4000
 
-# # 启动命令
-# CMD ["yarn", "server"]
+# 使用 serve 启动静态文件服务
+CMD ["serve", "-s", "dist", "-l", "4000"]
 

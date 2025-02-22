@@ -1,0 +1,49 @@
+{
+  "name": "jiang-xiaohongshu-crawler",
+  "private": true,
+  "version": "1.0.0",
+  "main": "main.html",
+  "window": {
+    "icon": "public/vite.svg",
+    "title": "小红书爬虫",
+    "width": 1200,
+    "height": 768,
+    "min_width": 800,
+    "min_height": 600,
+    "position": "center",
+    "toolbar": true,
+    "frame": true,
+    "show_in_taskbar": true,
+    "show": true,
+    "kiosk": false,
+    "transparent": false,
+    "resizable": true,
+    "chromium-args": "--disable-gpu --disable-software-rasterizer --ignore-certificate-errors"
+  },
+  "webkit": {
+    "plugin": true,
+    "java": false,
+    "page-cache": false
+  },
+  "js-flags": "--expose-gc",
+  "node-remote": [
+    "<all_urls>"
+  ],
+  "chromium-args": "--disable-gpu --disable-software-rasterizer --ignore-certificate-errors",
+  "scripts": {
+    "nw:build-win": "node ./winBuild.mjs",
+    "build-mac": "node ./macBuild.mjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.85.1",
+    "puppeteer": "^22.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nw": "^0.96.0",
+    "nw-builder": "^4.13.8"
+  }
+}

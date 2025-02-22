@@ -29,3 +29,6 @@ server/chrome-data/
 
 cache/
 dist-app/
+
+nw-project/node_modules
+nw-project/server/chrome-data

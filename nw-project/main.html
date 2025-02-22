@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小红书爬虫</title>
+  </head>
+  <body>
+    <script>
+      const gui = require("nw.gui");
+      const win = gui.Window.get();
+
+      // 启动 Express 服务器
+      const express = require("./server/index.js");
+      const server = express.listen(4000, () => {
+        window.location.href = "https://junfeng530.xyz/jiang/#/xiaohongshu";
+      });
+
+      // 错误处理
+      server.on("error", (error) => {
+        console.error("Server error:", error);
+        alert("服务器启动失败：" + error.message);
+      });
+
+      // 防止窗口意外关闭
+      process.on("uncaughtException", function (err) {
+        console.error("Uncaught Exception:", err);
+        alert("发生错误：" + err.message);
+      });
+
+      process.on("unhandledRejection", function (reason, promise) {
+        console.error("Unhandled Rejection at:", promise, "reason:", reason);
+        alert("Promise 错误：" + reason);
+      });
+
+      // 窗口关闭时清理资源
+      win.on("close", function () {
+        // 添加确认对话框
+        const choice = confirm("确定要关闭应用吗？");
+        if (choice) {
+          server.close(() => {
+            console.log("Server closed");
+            this.close(true);
+          });
+        }
+      });
+
+      // 添加开发者工具快捷键
+      document.addEventListener("keydown", function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === 73) {
+          win.showDevTools();
+        }
+      });
+    </script>
+  </body>
+</html>
