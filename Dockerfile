@@ -8,7 +8,9 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 # 安装依赖并全局安装 serve
-RUN yarn install && yarn global add serve
+RUN yarn install --network-timeout 100000 && \
+    yarn global add serve && \
+    yarn cache clean
 
 # 复制所有源代码
 COPY . .

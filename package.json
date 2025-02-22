@@ -39,22 +39,16 @@
     "tsc": "vue-tsc --noEmit --skipLibCheck",
     "prepare": "husky install",
     "server": "node server/index.js",
-    "nw:dev": "concurrently \"vite\" \"nw .\"",
-    "nw:build-win": "node ./winBuild.mjs",
-    "build-mac": "node ./macBuild.mjs"
+    "nw:dev": "concurrently \"vite\" \"nw .\""
   },
   "dependencies": {
     "ant-design-vue": "^4.0.7",
     "axios": "^1.6.2",
     "cors": "^2.8.5",
-    "exceljs": "^4.4.0",
-    "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
-    "node-schedule": "^2.1.1",
     "openai": "^4.85.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.0",
-    "puppeteer": "^22.0.0",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5",
     "xlsx": "^0.18.5"
@@ -80,8 +74,6 @@
     "lint-staged": "^15.1.0",
     "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
-    "nw": "^0.96.0",
-    "nw-builder": "^4.13.8",
     "prettier": "^2.7.1",
     "stylelint": "^13.2.1",
     "stylelint-config-clean-order": "^2.1.0",

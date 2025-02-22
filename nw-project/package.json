@@ -32,7 +32,8 @@
   "chromium-args": "--disable-gpu --disable-software-rasterizer --ignore-certificate-errors",
   "scripts": {
     "nw:build-win": "node ./winBuild.mjs",
-    "build-mac": "node ./macBuild.mjs"
+    "build-mac": "node ./macBuild.mjs",
+    "nw:dev": "nw ."
   },
   "dependencies": {
     "cors": "^2.8.5",
