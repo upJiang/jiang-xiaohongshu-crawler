@@ -26,3 +26,6 @@ dist-ssr
 *.sw?
 
 server/chrome-data/
+
+cache/
+dist-app/

@@ -182,7 +182,7 @@ const handleSaveToExcel = async () => {
 
     await saveToExcel(allData, "最新舆情数据.xlsx", false);
 
-    // 触发下载
+    // 修改下载链接
     window.location.href = `${
       import.meta.env.VITE_SERVER_HOST
     }/api/downloadExcel?filename=最新舆情数据.xlsx`;
@@ -209,26 +209,28 @@ const startCrawl = async () => {
     statusMessage.value = "正在采集数据...";
     statusType.value = "info";
 
-    // 创建新的 AbortController
     abortController.value = new AbortController();
 
-    // 将现有链接传递给后端
     const config = {
       ...crawlerConfig.value,
       existingLinks: Array.from(existingLinks.value),
     };
 
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_HOST}/api/crawl`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(config),
-        signal: abortController.value.signal,
-      },
+    // 使用完整的URL地址
+    const apiUrl = `${import.meta.env.VITE_SERVER_HOST}/api/crawl`.replace(
+      "undefined/",
+      "",
     );
+    console.log("请求URL:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config),
+      signal: abortController.value.signal,
+    });
 
     if (!response.ok) {
       throw new Error("采集请求失败");
@@ -272,10 +274,11 @@ const startCrawl = async () => {
     statusType.value = "error";
     // 判断是否为手动中断
     if ((error as Error).name === "AbortError") {
-      return; // 已在 stopCrawl 中处理了提示
+      return;
     }
     statusMessage.value = "采集失败: " + (error as Error).message;
     message.error("采集失败：" + (error as Error).message);
+
     // 在错误发生时也尝试保存已采集的数据
     if (dataList.value.length > 0) {
       try {

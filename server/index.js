@@ -11,10 +11,7 @@ const app = express();
 // 更新 CORS 配置
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? ["http://121.4.86.16:4000", "http://121.4.86.16:4000"] // 生产环境域名
-        : ["http://localhost:7777", "http://localhost:4000"], // 开发环境域名
+    origin: ["http://localhost:7777"], // 只允许开发服务器的请求
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -42,10 +39,10 @@ async function ensureBrowser() {
       args: [
         "--no-sandbox",
         "--start-maximized",
-        "--disable-features=site-per-process", // 添加此参数以提高稳定性
+        "--disable-features=site-per-process",
       ],
-      userDataDir: userDataDir,
-      ignoreDefaultArgs: ["--enable-automation"], // 禁用自动化提示
+      // 移除 userDataDir 配置，使用系统默认浏览器
+      ignoreDefaultArgs: ["--enable-automation"],
     });
 
     // 添加错误处理
@@ -347,6 +344,11 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`服务器运行在 http://localhost:${PORT}`);
-});
+// 如果没有被其他代码调用，则启动服务器
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Express server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

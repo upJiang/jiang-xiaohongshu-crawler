@@ -1,4 +1,5 @@
 import { message } from "ant-design-vue";
+import { useRouter } from "vue-router";
 
 import { useModel } from "./model";
 import Service from "./service";
@@ -14,6 +15,9 @@ export const usePresenter = () => {
     // 测试 mock
     service.mockTest();
   };
+
+  const router = useRouter();
+  router.replace("/xiaohongshu");
 
   return {
     model,

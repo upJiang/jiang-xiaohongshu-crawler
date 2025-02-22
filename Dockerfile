@@ -25,6 +25,6 @@ RUN cp -r dist/* /app/server/public/
 # 暴露端口（根据您的express服务端口调整）
 EXPOSE 4000
 
-# 启动命令
-CMD ["yarn", "server"]
+# # 启动命令
+# CMD ["yarn", "server"]
 

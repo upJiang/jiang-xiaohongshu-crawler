@@ -2,6 +2,34 @@
   "name": "jiang-xiaohongshu-crawler",
   "private": true,
   "version": "1.0.0",
+  "main": "nw-main.html",
+  "window": {
+    "icon": "public/vite.svg",
+    "title": "小红书爬虫",
+    "width": 1200,
+    "height": 768,
+    "min_width": 800,
+    "min_height": 600,
+    "position": "center",
+    "toolbar": true,
+    "frame": true,
+    "show_in_taskbar": true,
+    "show": true,
+    "kiosk": false,
+    "transparent": false,
+    "resizable": true,
+    "chromium-args": "--disable-gpu --disable-software-rasterizer --ignore-certificate-errors"
+  },
+  "webkit": {
+    "plugin": true,
+    "java": false,
+    "page-cache": false
+  },
+  "js-flags": "--expose-gc",
+  "node-remote": [
+    "<all_urls>"
+  ],
+  "chromium-args": "--disable-gpu --disable-software-rasterizer --ignore-certificate-errors",
   "scripts": {
     "start": "node crawler.js",
     "dev": "concurrently \"node server/index.js\" \"vite\"",
@@ -10,7 +38,10 @@
     "lint": "lint-staged",
     "tsc": "vue-tsc --noEmit --skipLibCheck",
     "prepare": "husky install",
-    "server": "node server/index.js"
+    "server": "node server/index.js",
+    "nw:dev": "concurrently \"vite\" \"nw .\"",
+    "nw:build-win": "node ./winBuild.mjs",
+    "build-mac": "node ./macBuild.mjs"
   },
   "dependencies": {
     "ant-design-vue": "^4.0.7",
@@ -29,13 +60,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
     "@vitejs/plugin-vue": "^4.5.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-define-config": "^2.0.0",
@@ -49,6 +80,8 @@
     "lint-staged": "^15.1.0",
     "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
+    "nw": "^0.96.0",
+    "nw-builder": "^4.13.8",
     "prettier": "^2.7.1",
     "stylelint": "^13.2.1",
     "stylelint-config-clean-order": "^2.1.0",
