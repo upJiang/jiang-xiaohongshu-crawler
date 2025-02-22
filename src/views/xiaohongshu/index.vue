@@ -123,8 +123,14 @@ const columns = [
   { title: "笔记标题", dataIndex: "笔记标题", width: 200 },
   { title: "笔记作者", dataIndex: "笔记作者", width: 120 },
   { title: "笔记时间", dataIndex: "笔记时间", width: 120 },
+  { title: "发表城市", dataIndex: "发表城市", width: 120 },
+  { title: "IP属地", dataIndex: "IP属地", width: 120 },
+  { title: "笔记链接", dataIndex: "笔记链接", width: 200 },
   { title: "笔记内容", dataIndex: "笔记内容", width: 300, ellipsis: true },
-  { title: "AI分析", dataIndex: "ai分析", width: 100 },
+  { title: "图片链接", dataIndex: "图片链接", width: 200, ellipsis: true },
+  { title: "评论内容", dataIndex: "评论内容", width: 200, ellipsis: true },
+  { title: "AI分析", dataIndex: "ai分析", width: 200, ellipsis: true },
+  { title: "AI思考过程", dataIndex: "ai思考过程", width: 300, ellipsis: true },
   { title: "关键词", dataIndex: "关键词", width: 100 },
 ];
 

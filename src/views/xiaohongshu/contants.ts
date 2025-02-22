@@ -7,6 +7,8 @@ export interface NoteData {
   笔记标题: string;
   笔记作者: string;
   笔记时间: string;
+  发表城市: string;
+  IP属地: string;
   笔记链接: string;
   笔记内容: string;
   图片链接: string;

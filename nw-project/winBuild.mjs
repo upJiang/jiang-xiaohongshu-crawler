@@ -3,13 +3,14 @@ import nwbuild from "nw-builder";
 const build = async () => {
   await nwbuild({
     mode: "build",
-    flavor: "sdk",
+    flavor: "normal",
     platform: "win",
     srcDir: "./",
     cacheDir: "./node_modules/nw",
     outDir: "../dist-app",
     glob: false,
     logLevel: "debug",
+    zip: true,
     app: {
       name: "小红书爬虫",
       /* File path of icon from where it is copied. */

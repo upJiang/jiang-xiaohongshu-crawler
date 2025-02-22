@@ -72,7 +72,8 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 提取页面数据
 const extractPageData = async (page) => {
-  return await page.evaluate(() => {
+  // 先获取基本数据
+  const basicData = await page.evaluate(() => {
     const getTextContent = (selector) => {
       const element = document.querySelector(selector);
       return element ? element.textContent.trim() : "";
@@ -101,16 +102,59 @@ const extractPageData = async (page) => {
       commentContent = noteText ? cleanText(noteText.textContent) : "";
     }
 
+    // 如果笔记时间里面有城市信息，则增加发表城市的属性，如果没有发表城市属性为未知
+    const noteTime = cleanText(getTextContent(".date"));
+    const city =
+      noteTime.split(" ")?.length > 2 ? noteTime.split(" ")[2] : "未知";
+
     return {
       笔记标题: cleanText(getTextContent(".title")),
       笔记作者: cleanText(getTextContent(".username")),
       笔记时间: cleanText(getTextContent(".date")),
+      发表城市: city,
       笔记链接: window.location.href,
       笔记内容: noteContent,
       图片链接: imgLink,
       评论内容: commentContent,
     };
   });
+
+  // 获取作者主页链接
+  const authorLink = await page.evaluate(() => {
+    const authorWrapper = document.querySelector(".author-wrapper");
+    if (!authorWrapper) return null;
+    const info = authorWrapper.querySelector(".info a");
+    return info ? info.getAttribute("href") : null;
+  });
+
+  // 如果找到作者链接，访问作者主页获取 IP 属地
+  if (authorLink) {
+    try {
+      await page.goto(`https://www.xiaohongshu.com${authorLink}`, {
+        waitUntil: "networkidle0",
+        timeout: 30000,
+      });
+      await delay(3000);
+
+      const ipLocation = await page.evaluate(() => {
+        const ipElement = document.querySelector(".user-IP");
+        return ipElement ? ipElement.textContent.split("：")[1] : "未知";
+      });
+
+      basicData.IP属地 = ipLocation;
+
+      // 返回到原始笔记页面
+      await page.goBack();
+      await delay(2000);
+    } catch (error) {
+      console.error("获取IP属地失败:", error);
+      basicData.IP属地 = "获取失败";
+    }
+  } else {
+    basicData.IP属地 = "未知";
+  }
+
+  return basicData;
 };
 
 app.post("/api/crawl", async (req, res) => {
@@ -225,13 +269,14 @@ app.post("/api/saveExcel", (req, res) => {
     const { data, filename } = req.body;
     const filePath = path.join(dataDir, filename);
 
-    // 创建工作簿和工作表
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(data, {
       header: [
         "笔记标题",
         "笔记作者",
         "笔记时间",
+        "发表城市",
+        "IP属地",
         "笔记链接",
         "笔记内容",
         "图片链接",
@@ -247,6 +292,8 @@ app.post("/api/saveExcel", (req, res) => {
       笔记标题: { wch: 30 },
       笔记作者: { wch: 15 },
       笔记时间: { wch: 15 },
+      发表城市: { wch: 15 },
+      IP属地: { wch: 15 },
       笔记链接: { wch: 50 },
       笔记内容: { wch: 100 },
       图片链接: { wch: 50 },

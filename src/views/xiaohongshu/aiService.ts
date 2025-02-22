@@ -29,11 +29,11 @@ export async function analyzeWithAI(
           content: `你是一位专业的舆情分析师。请分析每条内容并按以下格式返回结果：
 
                     内容1:
-                    情感倾向：[正面/负面]
+                    情感倾向：[正面/中性/负面]
                     分析理由：[详细说明分析过程]
 
                     内容2:
-                    情感倾向：[正面/负面]
+                    情感倾向：[正面/中性/负面]
                     分析理由：[详细说明分析过程]
 
                     依此类推...
@@ -42,8 +42,10 @@ export async function analyzeWithAI(
                     1. 关注内容中的情感词汇、评价性词语
                     2. 考虑用户的表达方式和语气
                     3. 分析内容对品牌形象的潜在影响
-                    4. 情感倾向只能是"正面"或"负面"
-                    5. 如果内容中性或无法判断，返回"正面"`,
+                    4. 情感倾向判断标准：
+                       - 正面：表达赞美、满意、推荐等积极情感
+                       - 中性：客观描述事实、活动通知、普通分享等无明显情感倾向
+                       - 负面：表达不满、批评、投诉等消极情感`,
         },
         {
           role: "user",
@@ -58,21 +60,21 @@ export async function analyzeWithAI(
       .filter((block) => block.trim());
 
     return contentBlocks.map((block) => {
-      const sentimentMatch = block.match(/情感倾向：(正面|负面)/);
+      const sentimentMatch = block.match(/情感倾向：(正面|中性|负面)/);
       const reasoningMatch = block.match(
         /分析理由：(.+?)(?=(?:\n\n|\n内容\d+:|$))/s,
       );
 
       return {
-        result: sentimentMatch ? sentimentMatch[1] : "正面",
+        result: sentimentMatch ? sentimentMatch[1] : "中性",
         reasoning: reasoningMatch ? reasoningMatch[1].trim() : "未提供分析理由",
       };
     });
   } catch (error) {
     console.error("批量AI分析出错:", error);
     return dataList.map(() => ({
-      result: "正面",
-      reasoning: "分析过程出错，默认返回正面评价",
+      result: "中性",
+      reasoning: "分析过程出错，默认返回中性评价",
     }));
   }
 }

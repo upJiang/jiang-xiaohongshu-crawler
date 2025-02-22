@@ -7,6 +7,8 @@ export const columnWidths = {
   笔记标题: 30,
   笔记作者: 15,
   笔记时间: 15,
+  发表城市: 15,
+  IP属地: 15,
   笔记链接: 50,
   笔记内容: 100,
   图片链接: 50,
@@ -28,7 +30,9 @@ export async function saveToExcel(
     if (append) {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_SERVER_HOST}/api/readExcel?filename=${filename}`, // 开发环境
+          `${
+            import.meta.env.VITE_SERVER_HOST
+          }/api/readExcel?filename=${filename}`, // 开发环境
         );
         if (response.ok) {
           existingData = await response.json();
@@ -49,9 +53,9 @@ export async function saveToExcel(
         headers: {
           "Content-Type": "application/json",
         },
-      body: JSON.stringify({
-        data: allData,
-        filename: filename,
+        body: JSON.stringify({
+          data: allData,
+          filename: filename,
         }),
       },
     );
