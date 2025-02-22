@@ -1,3 +1,23 @@
+puppteer + express + 前端项目 的方式部署到服务器后，服务器无法让用户自己打开浏览器操作，也就无法登录，或者让用户填登录信息太过于麻烦。
+
+所以使用 nw.js 打包成桌面应用，用户可以自己打开桌面应用操作，并且可以自己登录。
+
+项目结构时：
+
+主体是个前端项目，nw-project 是桌面应用，里面还有 express 的服务端代码
+
+- 桌面应用主要实现打开已经部署到服务器的前端页面
+
+- 前端页面是跟本地的桌面应用交互，这样才能够让用户去登录，去操作浏览器
+
+- 前端页面与服务层交互都是通过 locathost:4000 进行交互
+
+开发调试只需要执行：yarn dev
+
+打包桌面应用：cd nw-project && yarn nw:build-win，之前可以清除掉 server 里面的 chrome-data 文件夹，减小体积
+
+前端页面代码，也就是项目主体，只要提交了就会自动 ci/cd 到服务器
+
 部署过程：
 
 [添加阿里云镜像](https://cr.console.aliyun.com/cn-shenzhen/instance/namespaces)
