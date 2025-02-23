@@ -18,7 +18,7 @@ puppteer + express + 前端项目 的方式部署到服务器后，服务器无�
 
 - 前端页面是跟本地的桌面应用交互，这样才能够让用户去登录，去操作浏览器
 
-- 前端页面与服务层交互都是通过 locathost:4000 进行交互
+- 前端页面与服务层交互都是通过 locathost:4001 进行交互
 
 开发调试只需要执行：yarn dev
 
@@ -78,7 +78,7 @@ jobs:
             docker pull registry.cn-shenzhen.aliyuncs.com/jiang-xiaohongshu/jiang-xiaohongshu-crawler:latest
             docker ps -q --filter "name=jiang-xiaohongshu-crawler" | grep -q . && docker stop jiang-xiaohongshu-crawler || echo "Container jiang-xiaohongshu-crawler is not running"
             docker ps -a -q --filter "name=jiang-xiaohongshu-crawler" | grep -q . && docker rm jiang-xiaohongshu-crawler || echo "Container jiang-xiaohongshu-crawler does not exist"
-            docker run -d --name jiang-xiaohongshu-crawler -p 4000:4000 registry.cn-shenzhen.aliyuncs.com/jiang-xiaohongshu/jiang-xiaohongshu-crawler:latest
+            docker run -d --name jiang-xiaohongshu-crawler -p 4001:4001 registry.cn-shenzhen.aliyuncs.com/jiang-xiaohongshu/jiang-xiaohongshu-crawler:latest
 ```
 
 在项目根目录下新增 Dockerfile 文件，并添加以下内容：
@@ -90,23 +90,26 @@ FROM node:18-alpine
 # 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 yarn.lock
+# 先只复制构建必需的文件
 COPY package.json yarn.lock ./
 
-# 安装依赖
-RUN yarn install
+# 安装依赖并全局安装 serve
+RUN yarn install --network-timeout 100000 && \
+    yarn global add serve && \
+    yarn cache clean
 
-# 复制所有源代码
+# 复制所有源代码（放在依赖安装后，这样源码改变才会触发新的构建）
 COPY . .
 
-# 构建前端
-RUN yarn build
+# 删除旧的 dist 目录（如果存在），然后重新构建
+RUN rm -rf dist && \
+    yarn build
 
-# 暴露端口（根据您的express服务端口调整）
-EXPOSE 4000
+# 暴露端口
+EXPOSE 4001
 
-# 启动命令
-CMD ["yarn", "server"]
+# 使用 serve 启动静态文件服务
+CMD ["serve", "-s", "dist", "-l", "4001"]
 ```
 
 Github 仓库中的新建 5 个 Repository secrets
@@ -126,7 +129,7 @@ Github 仓库中的新建 5 个 Repository secrets
 - ALIYUN_DOCKER_USERNAME：阿里云 Docker 用户名
 - ALIYUN_DOCKER_PASSWORD：阿里云 Docker 密码
 
-腾讯防火墙需要开放 4000 端口
+腾讯防火墙需要开放 4001 端口
 
 在 nginx 配置文件 /www/server/nginx/conf/nginx.conf 中添加配置
 
@@ -139,7 +142,7 @@ server {
     ssl_certificate_key /www/server/panel/vhost/cert/junfeng530.xyz/privkey.pem;  # 替换为你的私钥路径
 
     location /xiaohongshu/ {
-        proxy_pass http://121.4.86.16:4000/;  # 代理到 Docker 容器所在的 3000 端口
+        proxy_pass http://121.4.86.16:4001/;  # 代理到 Docker 容器所在的 3000 端口
         proxy_set_header Host $host;  # 保持 Host 头部
         proxy_set_header X-Real-IP $remote_addr;  # 获取真实 IP
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # 传递代理链 IP
