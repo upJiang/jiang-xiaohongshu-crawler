@@ -14,16 +14,18 @@ RUN yarn install --network-timeout 100000 && \
 # 复制所有源代码（放在依赖安装后，这样源码改变才会触发新的构建）
 COPY . .
 
-# 删除旧的 dist 目录（如果存在），然后重新构建
-RUN rm -rf dist && \
-    yarn build && \
-    cd nw-project && \
-    yarn install --network-timeout 100000 && \
+# 分别处理主项目和 nw-project 的构建
+RUN yarn install --network-timeout 100000 && \
     yarn cache clean && \
     yarn build
 
-# 设置工作目录到 nw-project 文件夹
+# 单独处理 nw-project
 WORKDIR /app/nw-project
+COPY nw-project/package.json nw-project/yarn.lock ./
+RUN yarn install --network-timeout 100000 && \
+    yarn cache clean
+
+COPY nw-project .
 
 # 暴露端口（根据您的express服务端口调整）
 EXPOSE 4000
