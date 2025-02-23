@@ -9,7 +9,6 @@ COPY package.json yarn.lock ./
 
 # 安装依赖并全局安装 serve
 RUN yarn install --network-timeout 100000 && \
-    yarn global add serve && \
     yarn cache clean
 
 # 复制所有源代码（放在依赖安装后，这样源码改变才会触发新的构建）
@@ -17,14 +16,14 @@ COPY . .
 
 # 删除旧的 dist 目录（如果存在），然后重新构建
 RUN rm -rf dist && \
-    yarn build 
+    yarn build && \
     cd nw-project && \
     yarn install --network-timeout 100000 && \
+    yarn cache clean && \
     yarn build && \
-    yarn cache clean
 
-# 设置工作目录到 server 文件夹
-WORKDIR /app/nw-project/server
+# 设置工作目录到 nw-project 文件夹
+WORKDIR /app/nw-project
 
 # 暴露端口（根据您的express服务端口调整）
 EXPOSE 4000
