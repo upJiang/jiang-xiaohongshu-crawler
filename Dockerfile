@@ -4,7 +4,7 @@ FROM node:18-alpine
 # 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 yarn.lock
+# 先只复制构建必需的文件
 COPY package.json yarn.lock ./
 
 # 安装依赖并全局安装 serve
@@ -12,11 +12,11 @@ RUN yarn install --network-timeout 100000 && \
     yarn global add serve && \
     yarn cache clean
 
-# 复制所有源代码
+# 复制所有源代码（放在依赖安装后，这样源码改变才会触发新的构建）
 COPY . .
 
-# 构建前端
-RUN yarn build
+# 确保每次都重新构建（添加 --no-cache 选项）
+RUN yarn build --no-cache
 
 # 暴露端口
 EXPOSE 4000
