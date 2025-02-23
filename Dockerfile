@@ -23,5 +23,5 @@ RUN rm -rf dist && \
 EXPOSE 4001
 
 # 使用 serve 启动静态文件服务
-CMD ["serve", "-s", "dist", "-l", "4001"]
+CMD ["serve", "-s", "dist", "-l", "4001", "--host", "0.0.0.0"]
 
