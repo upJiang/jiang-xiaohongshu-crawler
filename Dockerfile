@@ -19,9 +19,10 @@ COPY . .
 RUN rm -rf dist && \
     yarn build 
 
+# 使用 serve 启动静态文件服务
+CMD ["yarn", "dev"]
+
 # 暴露端口
 EXPOSE 4001
 
-# 使用 serve 启动静态文件服务
-CMD ["serve", "-s", "dist", "-l", "4001", "--host", "0.0.0.0"]
 
