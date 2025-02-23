@@ -26,10 +26,15 @@
           title="历史数据"
           style="margin-top: 20px"
         >
+          <template #extra>
+            <a-button type="primary" @click="handleSaveHistoryToExcel">
+              保存到Excel
+            </a-button>
+          </template>
           <a-table
             :dataSource="existingData"
             :columns="columns"
-            :scroll="{ x: 1500 }"
+            :scroll="{ x: 1500, y: 500 }"
             :pagination="{
               total: existingData.length,
               pageSize: 10,
@@ -60,6 +65,13 @@
           <a-button type="primary" :loading="loading" @click="startCrawl">
             开始采集数据
           </a-button>
+          <a-button
+            type="primary"
+            :loading="loading"
+            @click="startInfiniteCrawl"
+          >
+            开始无限循环采集
+          </a-button>
           <a-button danger :disabled="!loading" @click="stopCrawl">
             停止采集
           </a-button>
@@ -77,14 +89,19 @@
     <!-- 采集结果展示区域 -->
     <a-card v-if="dataList.length" title="采集结果" style="margin-top: 20px">
       <template #extra>
-        <a-button type="primary" @click="handleSaveToExcel">
-          保存到Excel
-        </a-button>
+        <a-space>
+          <a-button type="primary" @click="handleSaveToExcel">
+            保存到Excel
+          </a-button>
+          <a-button type="primary" @click="handleMergeAndSave">
+            合并旧数据并保存
+          </a-button>
+        </a-space>
       </template>
       <a-table
         :dataSource="dataList"
         :columns="columns"
-        :scroll="{ x: 1500 }"
+        :scroll="{ x: 1500, y: 500 }"
         :pagination="{
           total: dataList.length,
           pageSize: 10,
@@ -134,11 +151,14 @@ const columns = [
   { title: "关键词", dataIndex: "关键词", width: 100 },
 ];
 
+const isInfiniteCrawling = ref(false);
+
 const stopCrawl = () => {
   if (abortController.value) {
     abortController.value.abort();
     abortController.value = null;
     loading.value = false;
+    isInfiniteCrawling.value = false;
     statusType.value = "warning";
     statusMessage.value = "采集已手动停止";
     message.warning("采集已停止");
@@ -204,7 +224,55 @@ const handleSaveToExcel = async () => {
   }
 };
 
-const startCrawl = async () => {
+const handleMergeAndSave = async () => {
+  try {
+    statusMessage.value = "正在合并并保存数据...";
+    statusType.value = "info";
+
+    // 合并现有数据和新数据
+    const allData = [...existingData.value, ...dataList.value];
+
+    await saveToExcel(allData, "合并舆情数据.xlsx", false);
+
+    // 修改下载链接
+    window.location.href = `${
+      import.meta.env.VITE_SERVER_HOST
+    }/api/downloadExcel?filename=合并舆情数据.xlsx`;
+
+    statusType.value = "success";
+    statusMessage.value = "数据合并保存成功！";
+    message.success("数据已合并保存到Excel");
+  } catch (error) {
+    console.error("保存错误:", error);
+    statusType.value = "error";
+    statusMessage.value = "保存失败: " + (error as Error).message;
+    message.error("保存失败：" + (error as Error).message);
+  }
+};
+
+const handleSaveHistoryToExcel = async () => {
+  try {
+    statusMessage.value = "正在保存历史数据...";
+    statusType.value = "info";
+
+    await saveToExcel(existingData.value, "历史舆情数据.xlsx", false);
+
+    window.location.href = `${
+      import.meta.env.VITE_SERVER_HOST
+    }/api/downloadExcel?filename=历史舆情数据.xlsx`;
+
+    statusType.value = "success";
+    statusMessage.value = "历史数据保存成功！";
+    message.success("历史数据已保存到Excel");
+  } catch (error) {
+    console.error("保存错误:", error);
+    statusType.value = "error";
+    statusMessage.value = "保存失败: " + (error as Error).message;
+    message.error("保存失败：" + (error as Error).message);
+  }
+};
+
+const startCrawl = async (infinite = false) => {
   if (!crawlerConfig.value.keyword) {
     message.error("请输入搜索关键词");
     return;
@@ -247,9 +315,9 @@ const startCrawl = async () => {
 
     if (!result.success) {
       throw new Error(result.error);
-      return;
     }
 
+    // 更新当前采集结果显示
     dataList.value = result.data;
 
     // AI分析
@@ -270,34 +338,58 @@ const startCrawl = async () => {
       message.warning("自动保存失败，请使用手动保存按钮");
     }
 
+    // 修改这部分逻辑，只在完成当前批次采集后更新历史数据
+    if (infinite) {
+      // 更新历史数据和链接集合
+      existingData.value = [...existingData.value, ...dataList.value];
+      existingLinks.value = new Set([
+        ...Array.from(existingLinks.value),
+        ...dataList.value.map((item) => item.笔记链接),
+      ]);
+      // 清空当前数据列表，准备下一轮采集
+      dataList.value = [];
+    }
+
     loading.value = false;
     statusType.value = "success";
     statusMessage.value = "数据采集完成！";
     message.success("采集成功！");
+
+    if (infinite && isInfiniteCrawling.value) {
+      // 延迟1秒后继续下一轮采集
+      setTimeout(() => {
+        startCrawl(true);
+      }, 1000);
+    }
   } catch (error) {
     console.error("采集错误:", error);
     loading.value = false;
     statusType.value = "error";
-    // 判断是否为手动中断
+
     if ((error as Error).name === "AbortError") {
+      isInfiniteCrawling.value = false;
       return;
     }
+
     statusMessage.value = "采集失败: " + (error as Error).message;
     message.error("采集失败：" + (error as Error).message);
 
-    // 在错误发生时也尝试保存已采集的数据
-    if (dataList.value.length > 0) {
-      try {
-        await saveToExcel(dataList.value, "最新舆情数据.xlsx", true);
-        message.info("已保存已采集的数据");
-      } catch (saveError) {
-        console.error("错误状态保存失败:", saveError);
-        message.warning("自动保存失败，请使用手动保存按钮");
-      }
+    // 如果是无限循环模式，等待后重试
+    if (infinite && isInfiniteCrawling.value) {
+      setTimeout(() => {
+        startCrawl(true);
+      }, 5000); // 出错后等待5秒再重试
     }
   } finally {
-    abortController.value = null;
+    if (!infinite) {
+      abortController.value = null;
+    }
   }
+};
+
+const startInfiniteCrawl = async () => {
+  isInfiniteCrawling.value = true;
+  await startCrawl(true);
 };
 </script>
 
