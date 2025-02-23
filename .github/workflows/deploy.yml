@@ -42,4 +42,4 @@ jobs:
             docker pull registry.cn-shenzhen.aliyuncs.com/jiang-xiaohongshu/jiang-xiaohongshu-crawler:latest
             docker ps -q --filter "name=jiang-xiaohongshu-crawler" | grep -q . && docker stop jiang-xiaohongshu-crawler || echo "Container jiang-xiaohongshu-crawler is not running"
             docker ps -a -q --filter "name=jiang-xiaohongshu-crawler" | grep -q . && docker rm jiang-xiaohongshu-crawler || echo "Container jiang-xiaohongshu-crawler does not exist"
-            docker run -d --name jiang-xiaohongshu-crawler -p 4001:4001 registry.cn-shenzhen.aliyuncs.com/jiang-xiaohongshu/jiang-xiaohongshu-crawler:latest
+            docker run -d --name jiang-xiaohongshu-crawler -p 4000:4000 registry.cn-shenzhen.aliyuncs.com/jiang-xiaohongshu/jiang-xiaohongshu-crawler:latest

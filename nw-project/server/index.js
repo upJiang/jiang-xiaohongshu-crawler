@@ -383,6 +383,14 @@ process.on("SIGTERM", async () => {
 
 const PORT = 4000;
 
+// 设置静态文件目录
+app.use(express.static(path.join(__dirname, "public")));
+
+// 所有的路由都返回 index.html，支持前端路由
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/dist/index.html"));
+});
+
 // 如果没有被其他代码调用，则启动服务器
 if (require.main === module) {
   app.listen(PORT, () => {

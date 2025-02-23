@@ -38,8 +38,8 @@
     "lint": "lint-staged",
     "tsc": "vue-tsc --noEmit --skipLibCheck",
     "prepare": "husky install",
-    "nw:dev": "concurrently \"vite\" \"nw .\"",
-    "server": "vite"
+    "server": "node ./nw-project/server/index.js",
+    "nw:dev": "concurrently \"vite\" \"nw .\""
   },
   "dependencies": {
     "ant-design-vue": "^4.0.7",

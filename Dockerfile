@@ -18,11 +18,18 @@ COPY . .
 # 删除旧的 dist 目录（如果存在），然后重新构建
 RUN rm -rf dist && \
     yarn build 
+    cd nw-project && \
+    yarn install --network-timeout 100000 && \
+    yarn build && \
+    yarn cache clean
 
-# 使用 serve 启动静态文件服务
-CMD ["yarn", "server"] 
+# 设置工作目录到 server 文件夹
+WORKDIR /app/nw-project/server
 
-# 暴露端口
-EXPOSE 4001
+# 暴露端口（根据您的express服务端口调整）
+EXPOSE 4000
+
+# 启动命令
+CMD ["yarn", "server"]
 
 
