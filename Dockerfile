@@ -20,7 +20,7 @@ RUN rm -rf dist && \
     cd nw-project && \
     yarn install --network-timeout 100000 && \
     yarn cache clean && \
-    yarn build && \
+    yarn build
 
 # 设置工作目录到 nw-project 文件夹
 WORKDIR /app/nw-project

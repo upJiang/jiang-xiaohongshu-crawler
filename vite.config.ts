@@ -30,7 +30,7 @@ export default defineConfig({
 
   server: {
     open: true,
-    port: 4000,
+    port: 8888,
     strictPort: true,
     // 设置代理示例
     proxy: {
