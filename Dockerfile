@@ -15,8 +15,9 @@ RUN yarn install --network-timeout 100000 && \
 # 复制所有源代码（放在依赖安装后，这样源码改变才会触发新的构建）
 COPY . .
 
-# 确保每次都重新构建
-RUN yarn build 
+# 删除旧的 dist 目录（如果存在），然后重新构建
+RUN rm -rf dist && \
+    yarn build 
 
 # 暴露端口
 EXPOSE 4000
