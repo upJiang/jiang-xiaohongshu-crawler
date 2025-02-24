@@ -11,7 +11,11 @@ const app = express();
 // 更新 CORS 配置
 app.use(
   cors({
-    origin: ["http://localhost:8888"], // 只允许开发服务器的请求
+    origin: [
+      "http://localhost:8888",
+      "http://10.39.3.75:8888",
+      "https://junfeng530.xyz",
+    ], // 只允许开发服务器的请求
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -382,14 +386,6 @@ process.on("SIGTERM", async () => {
 });
 
 const PORT = 4000;
-
-// 设置静态文件目录
-app.use(express.static(path.join(__dirname, "public")));
-
-// 所有的路由都返回 index.html，支持前端路由
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/dist/index.html"));
-});
 
 // 如果没有被其他代码调用，则启动服务器
 if (require.main === module) {

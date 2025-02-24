@@ -203,8 +203,7 @@ const handleSaveToExcel = async () => {
     statusMessage.value = "正在保存数据...";
     statusType.value = "info";
 
-    // 合并现有数据和新数据
-    const allData = [...existingData.value, ...dataList.value];
+    const allData = dataList.value;
 
     await saveToExcel(allData, "最新舆情数据.xlsx", false);
 
@@ -328,15 +327,6 @@ const startCrawl = async (infinite = false) => {
       data.ai分析 = aiResults[index].result;
       data.ai思考过程 = aiResults[index].reasoning;
     });
-
-    // 自动保存数据（即使后续步骤出错也会保存）
-    try {
-      statusMessage.value = "正在保存数据...";
-      await saveToExcel(dataList.value, "最新舆情数据.xlsx", true);
-    } catch (saveError) {
-      console.error("自动保存失败:", saveError);
-      message.warning("自动保存失败，请使用手动保存按钮");
-    }
 
     // 修改这部分逻辑，只在完成当前批次采集后更新历史数据
     if (infinite) {
