@@ -11,11 +11,7 @@ const app = express();
 // 更新 CORS 配置
 app.use(
   cors({
-    origin: [
-      "http://localhost:8888",
-      "http://10.39.3.75:8888",
-      "https://junfeng530.xyz",
-    ], // 只允许开发服务器的请求
+    origin: ["http://localhost:7777"], // 只允许开发服务器的请求
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,

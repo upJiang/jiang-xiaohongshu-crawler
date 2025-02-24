@@ -10,7 +10,6 @@ const build = async () => {
     outDir: "../dist-app",
     glob: false,
     logLevel: "debug",
-    zip: true,
     app: {
       name: "小红书爬虫",
       /* File path of icon from where it is copied. */
