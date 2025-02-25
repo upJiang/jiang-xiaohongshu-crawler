@@ -159,3 +159,11 @@ server {
 ```bash
 /etc/init.d/nginx restart
 ```
+
+## 如何添加到白名单
+
+1. Windows Defender:
+   - 打开 Windows 安全中心
+   - 点击"病毒和威胁防护"
+   - 在"病毒和威胁防护设置"下点击"管理设置"
+   - 在"排除项"下添加应用路径

@@ -263,14 +263,95 @@ app.get("/api/readExcel", (req, res) => {
   }
 });
 
-// 保存Excel文件
+// 添加数据清理和验证函数
+const cleanAndValidateData = (rawData) => {
+  const MAX_LENGTH = {
+    笔记标题: 200,
+    笔记作者: 50,
+    笔记时间: 200,
+    发表城市: 50,
+    IP属地: 50,
+    笔记链接: 500,
+    笔记内容: 2000,
+    图片链接: 1000,
+    评论内容: 1000,
+    ai分析: 100,
+    ai思考过程: 1000,
+    关键词: 100,
+  };
+
+  const cleanedData = [];
+  const skippedIndexes = [];
+
+  rawData.forEach((item, index) => {
+    try {
+      // 创建新的对象来存储清理后的数据
+      const cleanedItem = {};
+
+      // 处理每个字段
+      Object.keys(MAX_LENGTH).forEach((key) => {
+        let value = item[key] || "";
+        // 确保值是字符串
+        value = String(value);
+        // 如果超过最大长度，进行截断
+        if (value.length > MAX_LENGTH[key]) {
+          value = value.substring(0, MAX_LENGTH[key]);
+        }
+        cleanedItem[key] = value;
+      });
+
+      cleanedData.push(cleanedItem);
+    } catch (error) {
+      console.warn(`跳过第 ${index + 1} 条数据，原因：`, error.message);
+      skippedIndexes.push(index + 1);
+    }
+  });
+
+  return {
+    cleanedData,
+    skippedIndexes,
+  };
+};
+
+// 修改保存Excel文件的路由
 app.post("/api/saveExcel", (req, res) => {
   try {
     const { data, filename } = req.body;
-    const filePath = path.join(dataDir, filename);
 
+    // 输入验证
+    if (!Array.isArray(data)) {
+      throw new Error(`数据格式无效: 期望数组，实际收到 ${typeof data}`);
+    }
+
+    if (!filename || typeof filename !== "string") {
+      throw new Error(`文件名无效: ${filename}`);
+    }
+
+    // 清理和验证数据
+    const { cleanedData, skippedIndexes } = cleanAndValidateData(data);
+
+    if (cleanedData.length === 0) {
+      throw new Error("没有有效数据可以保存");
+    }
+
+    // 确保目录存在
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    // 生成文件名
+    const timeStamp = Date.now();
+    const randomNum = Math.floor(Math.random() * 10000);
+    const fileExt = path.extname(filename);
+    const baseName = path.basename(filename, fileExt);
+    const finalFilePath = path.join(
+      dataDir,
+      `${baseName}_${timeStamp}_${randomNum}${fileExt}`,
+    );
+
+    // 创建工作簿
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(data, {
+    const worksheet = XLSX.utils.json_to_sheet(cleanedData, {
       header: [
         "笔记标题",
         "笔记作者",
@@ -288,32 +369,45 @@ app.post("/api/saveExcel", (req, res) => {
     });
 
     // 设置列宽
-    const columnWidths = {
-      笔记标题: { wch: 30 },
-      笔记作者: { wch: 15 },
-      笔记时间: { wch: 15 },
-      发表城市: { wch: 15 },
-      IP属地: { wch: 15 },
-      笔记链接: { wch: 50 },
-      笔记内容: { wch: 100 },
-      图片链接: { wch: 50 },
-      评论内容: { wch: 50 },
-      ai分析: { wch: 50 },
-      ai思考过程: { wch: 120 },
-      关键词: { wch: 20 },
-    };
-    worksheet["!cols"] = Object.values(columnWidths);
-
-    // 将工作表添加到工作簿
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    worksheet["!cols"] = [
+      { wch: 30 }, // 笔记标题
+      { wch: 15 }, // 笔记作者
+      { wch: 15 }, // 笔记时间
+      { wch: 15 }, // 发表城市
+      { wch: 15 }, // IP属地
+      { wch: 50 }, // 笔记链接
+      { wch: 100 }, // 笔记内容
+      { wch: 50 }, // 图片链接
+      { wch: 50 }, // 评论内容
+      { wch: 50 }, // ai分析
+      { wch: 120 }, // ai思考过程
+      { wch: 20 }, // 关键词
+    ];
 
     // 保存文件
-    XLSX.writeFile(workbook, filePath);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, finalFilePath);
 
-    res.json({ success: true });
+    // 返回结果
+    res.json({
+      success: true,
+      savedFilePath: path.basename(finalFilePath),
+      isNewFile: true,
+      totalRecords: data.length,
+      savedRecords: cleanedData.length,
+      skippedRecords: skippedIndexes.length,
+      skippedIndexes: skippedIndexes,
+    });
   } catch (error) {
-    console.error("保存Excel文件失败:", error);
-    res.status(500).json({ error: "保存Excel文件失败" });
+    console.error("保存Excel文件失败:", {
+      error: error.message,
+      stack: error.stack,
+    });
+
+    res.status(500).json({
+      error: "保存Excel文件失败",
+      details: error.message,
+    });
   }
 });
 
