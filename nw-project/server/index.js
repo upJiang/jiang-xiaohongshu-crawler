@@ -11,14 +11,15 @@ const app = express();
 // 更新 CORS 配置
 app.use(
   cors({
-    origin: ["http://localhost:7777"], // 只允许开发服务器的请求
+    origin: ["http://localhost:8888"], // 只允许开发服务器的请求
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "500mb" }));
+app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 
 // 添加全局浏览器实例和用户数据目录配置
 let browser = null;

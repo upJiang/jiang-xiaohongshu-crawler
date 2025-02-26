@@ -120,7 +120,6 @@ import { ref } from "vue";
 
 import { analyzeWithAI } from "@/views/xiaohongshu/aiService";
 import type { CrawlerConfig, NoteData } from "@/views/xiaohongshu/contants";
-import { saveToExcel } from "@/views/xiaohongshu/excel";
 
 const loading = ref(false);
 const statusMessage = ref("");
