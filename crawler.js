@@ -23,6 +23,7 @@ async function saveToExcel(data, filename) {
     评论内容: 50,
     ai分析: 50,
     ai思考过程: 120,
+    标签: 50,
     关键词: 20,
   };
 
@@ -341,6 +342,7 @@ async function main() {
   dataList.forEach((data, index) => {
     data.ai分析 = aiResults[index].result;
     data.ai思考过程 = aiResults[index].reasoning;
+    data.标签 = aiResults[index].tags;
   });
 
   console.log("数据采集完毕", dataList);

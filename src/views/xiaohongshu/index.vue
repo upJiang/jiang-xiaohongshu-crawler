@@ -147,6 +147,7 @@ const columns = [
   { title: "评论内容", dataIndex: "评论内容", width: 200, ellipsis: true },
   { title: "AI分析", dataIndex: "ai分析", width: 200, ellipsis: true },
   { title: "AI思考过程", dataIndex: "ai思考过程", width: 300, ellipsis: true },
+  { title: "标签", dataIndex: "标签", width: 200, ellipsis: true },
   { title: "关键词", dataIndex: "关键词", width: 100 },
 ];
 
@@ -242,24 +243,6 @@ const handleSaveToExcel = async () => {
     statusMessage.value = "保存失败: " + (error as Error).message;
     message.error("保存失败：" + (error as Error).message);
   }
-};
-
-// 添加数据处理函数
-const processDataForExcel = (data) => {
-  return data.map((item) => ({
-    笔记标题: item.笔记标题 || "",
-    笔记作者: item.笔记作者 || "",
-    笔记时间: item.笔记时间 || "",
-    发表城市: item.发表城市 || "",
-    IP属地: item.IP属地 || "",
-    笔记链接: item.笔记链接 || "",
-    笔记内容: item.笔记内容 || "",
-    图片链接: item.图片链接 || "",
-    评论内容: item.评论内容 || "",
-    ai分析: item.ai分析 || "",
-    ai思考过程: item.ai思考过程 || "",
-    关键词: item.关键词 || "",
-  }));
 };
 
 // 添加生成唯一文件名的函数
@@ -418,6 +401,7 @@ const startCrawl = async (infinite = false) => {
 
     dataList.value.forEach((data, index) => {
       data.ai分析 = aiResults[index].result;
+      data.标签 = aiResults[index].tags;
       data.ai思考过程 = aiResults[index].reasoning;
     });
 
@@ -473,130 +457,6 @@ const startCrawl = async (infinite = false) => {
 const startInfiniteCrawl = async () => {
   isInfiniteCrawling.value = true;
   await startCrawl(true);
-};
-
-// 添加自动保存计数器
-const autoSaveCounter = ref(1);
-
-// 生成自增文件名的函数
-const generateAutoSaveFileName = (counter) => {
-  const today = new Date().toISOString().split("T")[0]; // 获取当前日期 YYYY-MM-DD
-  return `自动保存_${today}_第${counter}次采集.xlsx`;
-};
-
-// 自动保存函数
-const autoSaveToExcel = async (newData) => {
-  try {
-    // 合并历史数据和新数据
-    const mergedData = [...existingData.value, ...newData];
-    const fileName = generateAutoSaveFileName(autoSaveCounter.value);
-
-    // 调用后端API保存数据
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_HOST}/api/saveExcel`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          data: mergedData,
-          filename: fileName,
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error("自动保存失败");
-    }
-
-    const result = await response.json();
-    if (result.success) {
-      console.log(`自动保存成功：${fileName}`);
-      message.success(`自动保存成功：第${autoSaveCounter.value}次`);
-      autoSaveCounter.value++; // 增加计数器
-    } else {
-      throw new Error(result.error);
-    }
-  } catch (error) {
-    console.error("自动保存错误:", error);
-    message.error(`自动保存失败：${(error as Error).message}`);
-  }
-};
-
-// 修改无限循环采集函数
-const startInfiniteCollection = async () => {
-  isInfiniteCrawling.value = true;
-  statusMessage.value = "正在采集数据...";
-  statusType.value = "info";
-
-  try {
-    while (isInfiniteCrawling.value) {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_HOST}/api/crawl`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            keyword: crawlerConfig.value.keyword,
-            allNeedNums: parseInt(crawlerConfig.value.allNeedNums),
-            existingLinks: Array.from(existingLinks.value),
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("采集请求失败");
-      }
-
-      const result = await response.json();
-      if (result.success && result.data) {
-        // 更新数据
-        dataList.value = result.data;
-
-        // 自动保存当前采集的数据
-        await autoSaveToExcel(result.data);
-
-        // 更新已存在的链接
-        existingLinks.value = new Set([
-          ...Array.from(existingLinks.value),
-          ...result.data.map((item) => item.笔记链接),
-        ]);
-
-        // 更新状态
-        statusMessage.value = `成功采集 ${result.data.length} 条数据`;
-        statusType.value = "success";
-      }
-
-      // 等待指定时间后继续下一轮采集
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-  } catch (error) {
-    console.error("采集错误:", error);
-    statusType.value = "error";
-    statusMessage.value = "采集失败: " + (error as Error).message;
-    message.error("采集失败：" + (error as Error).message);
-    isInfiniteCrawling.value = false;
-  }
-};
-
-// 重置计数器的函数（可以在开始新的采集时调用）
-const resetAutoSaveCounter = () => {
-  autoSaveCounter.value = 1;
-};
-
-// 修改开始采集的函数
-const handleStartCollection = () => {
-  resetAutoSaveCounter(); // 重置计数器
-  startInfiniteCollection();
-};
-
-// 停止采集时重置计数器
-const handleStopCollection = () => {
-  isInfiniteCrawling.value = false;
-  resetAutoSaveCounter();
 };
 </script>
 

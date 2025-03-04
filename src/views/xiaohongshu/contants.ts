@@ -16,9 +16,11 @@ export interface NoteData {
   关键词?: string;
   ai分析?: string;
   ai思考过程?: string;
+  标签?: string[] | string;
 }
 
 export interface AIAnalysisResult {
   result: string;
   reasoning: string;
+  tags: string;
 }

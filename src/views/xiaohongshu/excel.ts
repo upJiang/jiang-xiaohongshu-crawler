@@ -15,6 +15,7 @@ export const columnWidths = {
   评论内容: 50,
   ai分析: 50,
   ai思考过程: 120,
+  标签: 50,
   关键词: 20,
 };
 

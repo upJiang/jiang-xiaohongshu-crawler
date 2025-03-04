@@ -278,6 +278,7 @@ const cleanAndValidateData = (rawData) => {
     评论内容: 1000,
     ai分析: 100,
     ai思考过程: 1000,
+    标签: 100,
     关键词: 100,
   };
 
@@ -365,6 +366,7 @@ app.post("/api/saveExcel", (req, res) => {
         "评论内容",
         "ai分析",
         "ai思考过程",
+        "标签",
         "关键词",
       ],
     });
@@ -382,6 +384,7 @@ app.post("/api/saveExcel", (req, res) => {
       { wch: 50 }, // 评论内容
       { wch: 50 }, // ai分析
       { wch: 120 }, // ai思考过程
+      { wch: 50 }, // 标签
       { wch: 20 }, // 关键词
     ];
 
