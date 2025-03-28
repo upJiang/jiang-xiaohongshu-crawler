@@ -59,6 +59,14 @@
               placeholder="请输入采集数量"
             />
           </a-form-item>
+          <a-form-item label="翻页间隔(秒)">
+            <a-input-number
+              v-model:value="crawlerConfig.pageInterval"
+              :min="1"
+              :max="60"
+              placeholder="请输入翻页间隔"
+            />
+          </a-form-item>
         </a-form>
 
         <a-space>
@@ -74,6 +82,13 @@
           </a-button>
           <a-button danger :disabled="!loading" @click="stopCrawl">
             停止采集
+          </a-button>
+          <a-button
+            type="primary"
+            :loading="timerTaskLoading"
+            @click="showTimerTaskModal"
+          >
+            开启定时任务
           </a-button>
         </a-space>
 
@@ -110,6 +125,25 @@
         }"
       />
     </a-card>
+
+    <!-- 添加定时任务设置弹窗 -->
+    <a-modal
+      v-model:visible="timerTaskModalVisible"
+      title="设置定时任务"
+      @ok="startTimerTask"
+      @cancel="stopTimerTask"
+    >
+      <a-form layout="vertical">
+        <a-form-item label="执行间隔(分钟)">
+          <a-input-number
+            v-model:value="timerTaskInterval"
+            :min="1"
+            :max="1440"
+            placeholder="请输入执行间隔"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -130,6 +164,7 @@ const abortController = ref<AbortController | null>(null);
 const crawlerConfig = ref<CrawlerConfig>({
   keyword: "研选家",
   allNeedNums: 5,
+  pageInterval: 3, // 默认3秒翻页间隔
 });
 
 const existingData = ref<NoteData[]>([]);
@@ -153,6 +188,12 @@ const columns = [
 
 const isInfiniteCrawling = ref(false);
 
+// 定时任务相关变量
+const timerTaskModalVisible = ref(false);
+const timerTaskInterval = ref(30); // 默认30分钟
+const timerTaskLoading = ref(false);
+const timerTaskId = ref<number | null>(null);
+
 const stopCrawl = () => {
   if (abortController.value) {
     abortController.value.abort();
@@ -163,6 +204,7 @@ const stopCrawl = () => {
     statusMessage.value = "采集已手动停止";
     message.warning("采集已停止");
   }
+  stopTimerTask();
 };
 
 const handleUpload = async (file: File) => {
@@ -457,6 +499,41 @@ const startCrawl = async (infinite = false) => {
 const startInfiniteCrawl = async () => {
   isInfiniteCrawling.value = true;
   await startCrawl(true);
+};
+
+// 显示定时任务设置弹窗
+const showTimerTaskModal = () => {
+  timerTaskModalVisible.value = true;
+};
+
+// 开始定时任务
+const startTimerTask = () => {
+  if (timerTaskId.value) {
+    clearInterval(timerTaskId.value);
+  }
+
+  timerTaskLoading.value = true;
+  timerTaskModalVisible.value = false;
+
+  // 立即执行一次
+  startCrawl();
+
+  // 设置定时任务
+  timerTaskId.value = window.setInterval(() => {
+    startCrawl();
+  }, timerTaskInterval.value * 60 * 1000);
+
+  message.success(`定时任务已启动，每${timerTaskInterval.value}分钟执行一次`);
+};
+
+// 停止定时任务
+const stopTimerTask = () => {
+  if (timerTaskId.value) {
+    clearInterval(timerTaskId.value);
+    timerTaskId.value = null;
+    timerTaskLoading.value = false;
+    message.success("定时任务已停止");
+  }
 };
 </script>
 

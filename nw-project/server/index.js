@@ -160,7 +160,12 @@ const extractPageData = async (page) => {
 
 app.post("/api/crawl", async (req, res) => {
   try {
-    const { keyword, allNeedNums, existingLinks = [] } = req.body;
+    const {
+      keyword,
+      allNeedNums,
+      existingLinks = [],
+      pageInterval = 3,
+    } = req.body;
 
     const currentBrowser = await ensureBrowser();
     const pages = await currentBrowser.pages();
@@ -197,7 +202,8 @@ app.post("/api/crawl", async (req, res) => {
       const endElement = await page.$("text/ - THE END -");
       if (endElement) break;
 
-      await delay(1000);
+      // 使用传入的翻页间隔时间
+      await delay(pageInterval * 1000);
     }
 
     // 采集数据

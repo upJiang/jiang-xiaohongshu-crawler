@@ -1,6 +1,7 @@
 export interface CrawlerConfig {
   keyword: string;
   allNeedNums: number;
+  pageInterval: number;
 }
 
 export interface NoteData {
