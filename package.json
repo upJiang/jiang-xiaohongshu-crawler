@@ -32,13 +32,13 @@
   "chromium-args": "--disable-gpu --disable-software-rasterizer --ignore-certificate-errors",
   "scripts": {
     "start": "node crawler.js",
-    "dev": "concurrently \"node ./nw-project/server/index.js\" \"vite\"",
+    "dev": "concurrently \"node ./server-project/server/index.js\" \"vite\"",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "lint-staged",
     "tsc": "vue-tsc --noEmit --skipLibCheck",
     "prepare": "husky install",
-    "server": "node ./nw-project/server/index.js",
+    "server": "node ./server-project/server/index.js",
     "nw:dev": "concurrently \"vite\" \"nw .\"",
     "dev:host": "vite --host"
   },

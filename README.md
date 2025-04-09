@@ -12,7 +12,7 @@ puppteer + express + 前端项目 的方式部署到服务器后，服务器无�
 
 项目结构时：
 
-主体是个前端项目，nw-project 是桌面应用，里面还有 express 的服务端代码
+主体是个前端项目，server-project 是桌面应用，里面还有 express 的服务端代码
 
 - 桌面应用主要实现打开已经部署到服务器的前端页面
 
@@ -22,7 +22,7 @@ puppteer + express + 前端项目 的方式部署到服务器后，服务器无�
 
 开发调试只需要执行：yarn dev
 
-打包桌面应用：cd nw-project && yarn nw:build-win，之前可以清除掉 server 里面的 chrome-data 文件夹，减小体积
+打包桌面应用：cd server-project && yarn nw:build-win，之前可以清除掉 server 里面的 chrome-data 文件夹，减小体积
 
 前端页面代码，也就是项目主体，只要提交了就会自动 ci/cd 到服务器
 
